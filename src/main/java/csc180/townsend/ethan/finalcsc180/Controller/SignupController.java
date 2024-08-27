@@ -29,30 +29,34 @@ public class SignupController {
 
     //region Action Events
     public void onSignUpButtonClick(ActionEvent event) {
-        if (validateUser()) {
-            // If all fields are valid, sign up the user and add to database
-            textDisplay.setText(database.signUpUser(usernameField.getText(), passwordField.getText()));
-            if (textDisplay.getText().equals(DatabaseController.strUserCreated)) {
-                try {
-                    // Load the login view
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/csc180/townsend/ethan/finalcsc180/login-view.fxml"));
-                    Parent root = loader.load();
+        if(database.connect()) {
+            if (validateUser()) {
+                // If all fields are valid, sign up the user and add to database
+                textDisplay.setText(database.signUpUser(usernameField.getText(), passwordField.getText()));
+                if (textDisplay.getText().equals(DatabaseController.strUserCreated)) {
+                    try {
+                        // Load the login view
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/csc180/townsend/ethan/finalcsc180/login-view.fxml"));
+                        Parent root = loader.load();
 
-                    // Get the controller and set the textDisplay label
-                    LoginController loginController = loader.getController();
-                    loginController.textDisplay.setText("User Created Successfully");
+                        // Get the controller and set the textDisplay label
+                        LoginController loginController = loader.getController();
+                        loginController.textDisplay.setText("User Created Successfully");
 
-                    // Change the scene
-                    Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-                    stage.setScene(new Scene(root));
-                    stage.setTitle(SongApplication.loginTitle);
-                    stage.show();
-                } catch (IOException e) {
-                    System.out.println(e.getMessage() + "Error changing scene");
+                        // Change the scene
+                        Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+                        stage.setScene(new Scene(root));
+                        stage.setTitle(SongApplication.loginTitle);
+                        stage.show();
+                    } catch (IOException e) {
+                        System.out.println(e.getMessage() + "Error changing scene");
+                    }
+                } else if (textDisplay.getText().equals(DatabaseController.strUserExists)) {
+                    textDisplay.setText("This User already exists!");
                 }
-            } else if (textDisplay.getText().equals(DatabaseController.strUserExists)) {
-                textDisplay.setText("This User already exists!");
             }
+        } else {
+            System.out.println("SQL Connection Failed - SIGNUP");
         }
     }
 

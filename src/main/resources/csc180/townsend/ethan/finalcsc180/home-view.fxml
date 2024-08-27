@@ -10,16 +10,15 @@
     </padding>
 
     <Label fx:id="currentUsername" text="Current User" textAlignment="CENTER" />
-    <TextField fx:id="usernameField" promptText="Username" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"/>
-    <TextField fx:id="passwordField" promptText="Password" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"/>
 
     <HBox alignment="CENTER" spacing="10.0">
         <Button onAction="#onLogoutButtonClick" text="Logout" textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
         <Button onAction="#onEditPreferencesButtonClick" text="Edit Preferences" textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
-        <Button onAction="#displayTopSongs" text="Display Top Songs" textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
     </HBox>
 
     <ScrollPane fitToWidth="true" fitToHeight="true">
         <VBox fx:id="artistListContainer" spacing="5.0" />
     </ScrollPane>
+
+    <VBox fx:id="topSongsContainer" spacing="5.0" />
 </VBox>

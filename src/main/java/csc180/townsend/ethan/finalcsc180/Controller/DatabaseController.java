@@ -1,14 +1,16 @@
 package csc180.townsend.ethan.finalcsc180.Controller;
 
+import org.jsoup.select.Elements;
+
 import java.sql.*;
 
 public class DatabaseController {
 
     static String currentUserUsername; // Stores the username of the currently logged in user
     //region sql connection info
-    static final String url = "jdbc:mysql://localhost:3306/csc180-final?allowPublicKeyRetrieval=true&useSSL=false";
+    static final String url = System.getenv("SONG_DB_URL");
     static final String user = "root";
-    static final String password = System.getenv("MYSQL_ROOT_PASSWORD");
+    static final String password = "test";
     //endregion
 
     //region sout messages
@@ -47,7 +49,7 @@ public class DatabaseController {
      * @return true if the user is found, false if not
      */
     public boolean loginUser(String _username, String _password) {
-        String sql = "SELECT * FROM users WHERE user_username = ? AND user_password = ?"; // SQL query to find a user by username and password
+        String sql = "SELECT * FROM users WHERE user_name = ? AND user_password = ?"; // SQL query to find a user by username and password
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement pst = conn.prepareStatement(sql)) { // Create a prepared statement object
             pst.setString(1, _username.trim()); // Set the first parameter to the username
@@ -80,7 +82,7 @@ public class DatabaseController {
      * @return a string message
      */
     public String signUpUser(String _username, String _password) {
-        String sql = "INSERT INTO users(user_username, user_password) VALUES(?,?)"; // SQL query to insert a new user
+        String sql = "INSERT INTO users(user_name, user_password) VALUES(?,?)"; // SQL query to insert a new user
         // Check if the user already exists
         if (findUserUsername(_username).equals(_username)) {
             return strUserExists; // Return a message if the user already exists
@@ -100,13 +102,13 @@ public class DatabaseController {
     }
 
     public String findUserUsername(String _username){
-        String sql = "SELECT user_username FROM users WHERE user_username = ?"; // SQL query to find a user by username
+        String sql = "SELECT user_name FROM users WHERE user_name = ?"; // SQL query to find a user by username
         try(Connection conn = DriverManager.getConnection(url, user, password);
             PreparedStatement pst = conn.prepareStatement(sql)){
             pst.setString(1, _username); // Set the first parameter to the username
             ResultSet rs = pst.executeQuery(); // Execute the query
             if(rs.next()){
-                return rs.getString("user_username"); // Return the username if the user is found
+                return rs.getString("user_name"); // Return the username if the user is found
             } else {
                 return strUserNotFound; // Return a message if the user is not found
             }
@@ -114,6 +116,44 @@ public class DatabaseController {
             System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
             System.out.println("SQL Connection Failed - FIND USER"); // Print failure message
             return "Error Finding User";
+        }
+    }
+
+    public int checkArtistExists(String artist_name){
+        if(connect()) {
+            String sql = "SELECT artist_id FROM artists WHERE artist_name = ?";
+            try (Connection conn = DriverManager.getConnection(url, user, password);
+                 PreparedStatement pst = conn.prepareStatement(sql)) {
+                pst.setString(1, artist_name);
+                ResultSet rs = pst.executeQuery();
+                if(rs.next()){
+                    return Integer.parseInt(rs.toString());
+                } else {
+                    return 0;
+                }
+            } catch (SQLException e) {
+                System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
+                System.out.println("SQL Connection Failed - FIND USER"); // Print failure message
+            } catch (NumberFormatException ignore){
+
+            }
+        } else {
+            System.out.println("SQL Connection Failed - CHECK ARTIST EXISTS");
+        }
+        return 0;
+    }
+
+    public void addArtistToDatabase(String artist){
+        if(connect()){
+            String sql = "INSERT INTO artists(artist_name) VALUES (?)";
+            try (Connection conn = DriverManager.getConnection(url, user, password);
+                 PreparedStatement pst = conn.prepareStatement(sql)) {
+                pst.setString(1, artist);
+                pst.executeUpdate();
+            }catch (SQLException e){
+                System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
+                System.out.println("SQL Connection Failed - SIGN UP"); // Print failure message
+            }
         }
     }
 }
