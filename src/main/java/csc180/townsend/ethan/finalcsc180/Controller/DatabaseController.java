@@ -3,6 +3,8 @@ package csc180.townsend.ethan.finalcsc180.Controller;
 import org.jsoup.select.Elements;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseController {
 
@@ -127,7 +129,7 @@ public class DatabaseController {
                 pst.setString(1, artist_name);
                 ResultSet rs = pst.executeQuery();
                 if(rs.next()){
-                    return Integer.parseInt(rs.toString());
+                    return rs.getInt("artist_id");
                 } else {
                     return 0;
                 }
@@ -141,6 +143,23 @@ public class DatabaseController {
             System.out.println("SQL Connection Failed - CHECK ARTIST EXISTS");
         }
         return 0;
+    }
+
+    public List<String> returnAllArtists(){
+        String sql = "SELECT artist_name FROM artists";
+        List<String> artistNames = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement pst = conn.prepareStatement(sql)) {
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()){
+                artistNames.add(rs.getString("artist_name"));
+            }
+            return artistNames;
+        }catch (SQLException e){
+            System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
+            System.out.println("SQL Connection Failed - FIND USER"); // Print failure message
+            return null;
+        }
     }
 
     public void addArtistToDatabase(String artist){

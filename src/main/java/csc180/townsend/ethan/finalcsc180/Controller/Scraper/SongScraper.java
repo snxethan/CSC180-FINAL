@@ -73,7 +73,7 @@ public class SongScraper {
     }
 
     public static List<String> getTopSongs(){
-        //FIXME: FILTER OUT DUPLICATES
+        //FIXME: FILTER OUT DUPLICATES (there should be none)
         String response = request();
         if (response == null) {
             System.out.println("Failed to fetch data from the URL.");
@@ -114,10 +114,21 @@ public class SongScraper {
             // Select artist elements within the row
             Elements artistElements = row.select("a[href*='../artist']");
             for (Element artistElement : artistElements) {
-                artists.add(artistElement.text());
+                //artists.add(artistElement.text());
+                //checks the database to see if person exists
+                int possibleID = dbController.checkArtistExists(artistElement.text());
+                if(possibleID == 0){
+                    //add to database, then save the ID to artistIDs
+                    dbController.addArtistToDatabase(artistElement.text());
+                    artists.add(artistElement.text());
+                    //artistIDs.add(dbController.checkArtistExists(artistElement.toString()));
+                } else {
+                    //save ID's to artistIDs
+                    //artistIDs.add(dbController.checkArtistExists(artistElement.toString()));
+                }
             }
         }
-        return artists;
+        return dbController.returnAllArtists();
     }
 
 }
