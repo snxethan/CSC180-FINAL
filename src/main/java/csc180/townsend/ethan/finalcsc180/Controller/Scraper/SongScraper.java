@@ -12,19 +12,19 @@ import java.util.List;
 public class SongScraper {
 
     private static final String URL = "https://kworb.net/spotify/country/global_weekly.html";
-
-    public static List<String> getTop200Songs() throws IOException {
-        List<String> topSongs = new ArrayList<>();
-        Document doc = (Document) Jsoup.connect(URL).get();
-        Elements rows = doc.select("table.chart tr");
-
-        for (Element row : rows) {
-            Elements columns = row.select("td");
-            if (columns.size() > 1) {
-                String artistAndTitle = columns.get(1).text();
-                topSongs.add(artistAndTitle);
-            }
-        }
-        return topSongs;
-    }
+//
+//    public static List<String> getTop200Songs() throws IOException {
+//        List<String> topSongs = new ArrayList<>();
+//        Document doc = (Document) Jsoup.connect(URL).get();
+//        Elements rows = doc.select("table.chart tr");
+//
+//        for (Element row : rows) {
+//            Elements columns = row.select("td");
+//            if (columns.size() > 1) {
+//                String artistAndTitle = columns.get(1).text();
+//                topSongs.add(artistAndTitle);
+//            }
+//        }
+//        return topSongs;
+//    }
 }

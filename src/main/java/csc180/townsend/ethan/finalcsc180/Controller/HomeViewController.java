@@ -2,7 +2,6 @@ package csc180.townsend.ethan.finalcsc180.Controller;
 
 import csc180.townsend.ethan.finalcsc180.Controller.Scraper.SongScraper;
 import csc180.townsend.ethan.finalcsc180.SongApplication;
-import csc180.townsend.ethan.finalcsc180.SpotifyScraper;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -68,17 +67,17 @@ public class HomeViewController {
     }
 
     public void displayTopSongs() {
-        try {
-            List<String> topSongs = SongScraper.getTop200Songs();
-            List<String> filteredSongs = filterSongsByPreferences(topSongs);
-            artistListContainer.getChildren().clear();
-            for (String song : filteredSongs) {
-                Label songLabel = new Label(song);
-                artistListContainer.getChildren().add(songLabel);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            List<String> topSongs = SongScraper.getTop200Songs();
+//            List<String> filteredSongs = filterSongsByPreferences(topSongs);
+//            artistListContainer.getChildren().clear();
+//            for (String song : filteredSongs) {
+//                Label songLabel = new Label(song);
+//                artistListContainer.getChildren().add(songLabel);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private List<String> filterSongsByPreferences(List<String> topSongs) {
