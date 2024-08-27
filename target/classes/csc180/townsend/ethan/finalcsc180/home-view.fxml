@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="csc180.townsend.ethan.finalcsc180.Controller.HomeViewController">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <Label fx:id="currentUsername" text="Current User" textAlignment="CENTER" />
+    <TextField fx:id="usernameField" promptText="Username" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"/>
+    <TextField fx:id="passwordField" promptText="Password" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"/>
+
+    <HBox alignment="CENTER" spacing="10.0">
+        <Button onAction="#onLogoutButtonClick" text="Logout" textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
+    </HBox>
+</VBox>
