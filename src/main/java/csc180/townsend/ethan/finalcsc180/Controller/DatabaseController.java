@@ -126,7 +126,7 @@ public class DatabaseController {
                 if(rs.next()){
                     return rs.getInt("artist_id");
                 } else {
-                    return 0;
+                    return -1;
                 }
             } catch (SQLException e) {
                 System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
@@ -137,7 +137,7 @@ public class DatabaseController {
         } else {
             System.out.println("SQL Connection Failed - CHECK ARTIST EXISTS");
         }
-        return 0;
+        return -1;
     }
 
     /**
@@ -180,12 +180,12 @@ public class DatabaseController {
             if(rs.next()){
                 return rs.getInt("user_id");
             } else {
-                return 0;
+                return -1;
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
             System.out.println("SQL Connection Failed - FIND USER ID"); // Print failure message
-            return 0;
+            return -1;
         }
     }
 
@@ -198,12 +198,12 @@ public class DatabaseController {
             if(rs.next()){
                 return rs.getInt("artist_id");
             } else {
-                return 0;
+                return -1;
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
             System.out.println("SQL Connection Failed - FIND ARTIST ID"); // Print failure message
-            return 0;
+            return -1;
         }
     }
     public String findArtistName(int artist_id){
