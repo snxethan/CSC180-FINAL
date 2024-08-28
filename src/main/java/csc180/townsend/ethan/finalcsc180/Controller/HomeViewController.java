@@ -32,6 +32,8 @@ public class HomeViewController {
     private final DatabaseController database = new DatabaseController();
     private List<String> selectedArtists = new ArrayList<>();
     private List<SongScraper.Song> topSongs = new ArrayList<>();
+    int user_id;
+    String user_name;
 
     public void initialize() {
         // Set the text fields to the current user's information
@@ -100,12 +102,23 @@ public class HomeViewController {
         }
     }
 
-    private List<SongScraper.Song> filterSongsByPreferences(List<SongScraper.Song> topSongs) {
-        if (selectedArtists.isEmpty()) {
+    private List<SongScraper.Song> filterSongsByPreferences(List<SongScraper.Song> topSongs, int user_id) {
+        List<SongScraper.Song> songList = new ArrayList<>();
+        List<Integer> preferenceList = database.getPreferences(user_id);
+        if(preferenceList == null || preferenceList.isEmpty()){
             return topSongs;
         }
-        return topSongs.stream()
-                .filter(song -> song.getArtists().stream().anyMatch(selectedArtists::contains))
-                .collect(Collectors.toList());
+
+        for(SongScraper.Song song : topSongs){
+            List<String> artists = song.getArtists();
+            for(String artist : artists) {
+                int artist_id = database.findArtistID(artist);
+
+                if(preferenceList.contains(artist_id)) {
+                    songList.add(song);
+                }
+            }
+        }
+        return songList;
     }
 }
