@@ -19,7 +19,6 @@ public class DatabaseController {
     static final String strUserFound = "User Found";
     static final String strUserNotFound = "User Not Found";
     static final String strArtistNotFound = "Artist Not Found";
-    static final String strArtistFound = "Artist Found";
     //endregion
 
     /**
@@ -167,9 +166,9 @@ public class DatabaseController {
     //region find id
 
     /**
-     *
-     * @param _username
-     * @return
+     * finds the user's id
+     * @param _username the username of the user
+     * @return the user's id
      */
     public int findUserID(String _username){
         String sql = "SELECT user_id FROM users WHERE user_name = ?";
@@ -189,6 +188,11 @@ public class DatabaseController {
         }
     }
 
+    /**
+     * finds the artist's id
+     * @param artist the name of the artist
+     * @return the artist's id
+     */
     public int findArtistID(String artist){
         String sql = "SELECT artist_id FROM artists WHERE artist_name = ?";
         try (Connection conn = DriverManager.getConnection(url, user, password);
@@ -206,6 +210,12 @@ public class DatabaseController {
             return -1;
         }
     }
+
+    /**
+     * finds the artist names
+     * @param artist_id the id of the artist
+     * @return the name of the artist
+     */
     public String findArtistName(int artist_id){
         String sql = "SELECT artist_name FROM artists WHERE artist_id = ?";
         try (Connection conn = DriverManager.getConnection(url, user, password);
@@ -223,10 +233,11 @@ public class DatabaseController {
             return "Error Finding Artist";
         }
     }
-    //endregion
 
-
-
+    /**
+     * displays all artists names
+     * @return a list of all artist names
+     */
     public List<String> returnAllArtists(){
         String sql = "SELECT artist_name FROM artists";
         List<String> artistNames = new ArrayList<>();
@@ -243,7 +254,13 @@ public class DatabaseController {
             return null;
         }
     }
+    //endregion
 
+    //region add artist & preferred artist
+    /**
+     * Adds an artist to the database
+     * @param artist the name of the artist
+     */
     public void addArtistToDatabase(String artist){
         if(connect(false)){
             String sql = "INSERT INTO artists(artist_name) VALUES (?)";
@@ -258,6 +275,11 @@ public class DatabaseController {
         }
     }
 
+    /**
+     * Adds a preferred artist connecting to the user id & artist id
+     * @param artist_id the id of the artist
+     * @param user_name the name of the user
+     */
     public void addPreferredArtist(int artist_id, String user_name){
         if(connect(false)){
             //get user id:
@@ -272,12 +294,18 @@ public class DatabaseController {
                 pst.setInt(1, userID);
                 pst.setInt(2, artistID);
                 pst.executeUpdate();
+                System.out.println("Added " + findArtistName(artist_id) + " to " + user_name + "'s preferred artists");
             }catch (SQLException e){
                 System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
                 System.out.println("SQL Connection Failed - ADD PREFERRED ARTIST"); // Print failure message
             }
         }
     }
+
+    /**
+     * Removes a preferred artist from the user
+     * @param user_id the id of the user
+     */
     public void removePerferredArtists(int user_id){
         if(connect(false)){
             String sql = "DELETE FROM users_preferredartists WHERE user_id = ?";
@@ -292,6 +320,11 @@ public class DatabaseController {
         }
     }
 
+    /**
+     * Gets the preferred artists of the user
+     * @param user_id the id of the user
+     * @return a list of the preferred artists
+     */
     public List<Integer> getPreferences(int user_id){
         List<Integer> preferredArtist = new ArrayList<>();
         if(connect(false)){
@@ -311,4 +344,5 @@ public class DatabaseController {
         }
         return null;
     }
+    //endregion
 }
