@@ -1,5 +1,6 @@
 package csc180.townsend.ethan.finalcsc180;
 
+import csc180.townsend.ethan.finalcsc180.Controller.DatabaseController;
 import csc180.townsend.ethan.finalcsc180.Controller.Scraper.SongScraper;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -19,7 +20,6 @@ public class SongApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-//        SongScraper.webScraping();
         FXMLLoader fxmlLoader = new FXMLLoader(SongApplication.class.getResource("login-view.fxml")); // Load the FXML file
         Scene scene = new Scene(fxmlLoader.load()); // Remove fixed width and height
         stage.setTitle(loginTitle); // Set the title of the window
@@ -32,6 +32,10 @@ public class SongApplication extends Application {
     }
 
     public static void main(String[] args) {
-        launch();
+        if(DatabaseController.connect(true)){
+            launch();
+        } else {
+            System.out.println("SQL Connection Failed - MAIN");
+        }
     }
 }

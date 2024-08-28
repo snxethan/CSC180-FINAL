@@ -1,7 +1,5 @@
 package csc180.townsend.ethan.finalcsc180.Controller;
 
-import org.jsoup.select.Elements;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +24,17 @@ public class DatabaseController {
      * Connects to the SQL database
      * @return true if connection is successful, false if not
      */
-    public boolean connect() {
+    public static boolean connect(boolean wantDisplay) {
         String sql = "SELECT VERSION()"; // SQL query to test connection
         try(Connection conn = DriverManager.getConnection(url, user, password);
             Statement stmt = conn.createStatement(); // Create a statement object
             ResultSet rs = stmt.executeQuery(sql)){
-            if(rs.next()){ // If the query returns a result
+            if(rs.next()) { // If the query returns a result
+                if (wantDisplay)
+                {
                 System.out.println(rs.getString(1)); // Print the result
                 System.out.println("SQL Connection Successful"); // Print success message
+                }
                 return true;
             }
         } catch (SQLException e) {
@@ -44,6 +45,7 @@ public class DatabaseController {
         return false;
     }
 
+    //region sign up & login
     /**
      * Logs in a user
      * @param _username the username of the user
@@ -85,11 +87,12 @@ public class DatabaseController {
      */
     public String signUpUser(String _username, String _password) {
         String sql = "INSERT INTO users(user_name, user_password) VALUES(?,?)"; // SQL query to insert a new user
-        // Check if the user already exists
-        if (findUserUsername(_username).equals(_username)) {
-            return strUserExists; // Return a message if the user already exists
+        // see if the user already exists
+        if(validateUserName(_username).equals(strUserExists)){
+            return strUserExists;
         }
 
+        // if not, create the user
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement pst = conn.prepareStatement(sql)) {
             pst.setString(1, _username.trim()); // Set the first parameter to the username
@@ -98,31 +101,21 @@ public class DatabaseController {
             return strUserCreated;
         } catch (SQLException e) {
             System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
-            System.out.println("SQL Connection Failed - SIGN UP"); // Print failure message
+            System.out.println("SQL Connection Failed - SIGN UP USER"); // Print failure message
             return "Error Creating User";
         }
     }
+    //endregion
 
-    public String findUserUsername(String _username){
-        String sql = "SELECT user_name FROM users WHERE user_name = ?"; // SQL query to find a user by username
-        try(Connection conn = DriverManager.getConnection(url, user, password);
-            PreparedStatement pst = conn.prepareStatement(sql)){
-            pst.setString(1, _username); // Set the first parameter to the username
-            ResultSet rs = pst.executeQuery(); // Execute the query
-            if(rs.next()){
-                return rs.getString("user_name"); // Return the username if the user is found
-            } else {
-                return strUserNotFound; // Return a message if the user is not found
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
-            System.out.println("SQL Connection Failed - FIND USER"); // Print failure message
-            return "Error Finding User";
-        }
-    }
+    //region validate user & artist
 
-    public int checkArtistExists(String artist_name){
-        if(connect()) {
+    /**
+     * Validates the artist and ensures they exist
+     * @param artist_name the name of the arist
+     * @return the artist id or 0 if they don't exist
+     */
+    public int validateArtist(String artist_name){
+        if(connect(false)) {
             String sql = "SELECT artist_id FROM artists WHERE artist_name = ?";
             try (Connection conn = DriverManager.getConnection(url, user, password);
                  PreparedStatement pst = conn.prepareStatement(sql)) {
@@ -145,6 +138,76 @@ public class DatabaseController {
         return 0;
     }
 
+    /**
+     * validates the user name
+     * @param _username the username to validate
+     * @return a string message, strUserExists if the user exists, strUserNotFound if the user doesn't
+     */
+    public String validateUserName(String _username){
+        String sql = "SELECT user_name FROM users WHERE user_name = ?";
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement pst = conn.prepareStatement(sql)) {
+            pst.setString(1, _username);
+            ResultSet rs = pst.executeQuery();
+            if(rs.next()){
+                return strUserExists;
+            } else {
+                return strUserNotFound;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
+            System.out.println("SQL Connection Failed - FIND USER NAME"); // Print failure message
+            return "Error Finding User";
+        }
+    }
+    //endregion
+
+    //region find id
+
+    /**
+     *
+     * @param _username
+     * @return
+     */
+    public int findUserID(String _username){
+        String sql = "SELECT user_id FROM users WHERE user_name = ?";
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement pst = conn.prepareStatement(sql)) {
+            pst.setString(1, _username);
+            ResultSet rs = pst.executeQuery();
+            if(rs.next()){
+                return rs.getInt("user_id");
+            } else {
+                return 0;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
+            System.out.println("SQL Connection Failed - FIND USER ID"); // Print failure message
+            return 0;
+        }
+    }
+
+    public int findArtistID(String artist){
+        String sql = "SELECT artist_id FROM artists WHERE artist_name = ?";
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement pst = conn.prepareStatement(sql)) {
+            pst.setString(1, artist);
+            ResultSet rs = pst.executeQuery();
+            if(rs.next()){
+                return rs.getInt("artist_id");
+            } else {
+                return 0;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
+            System.out.println("SQL Connection Failed - FIND ARTIST ID"); // Print failure message
+            return 0;
+        }
+    }
+    //endregion
+
+
+
     public List<String> returnAllArtists(){
         String sql = "SELECT artist_name FROM artists";
         List<String> artistNames = new ArrayList<>();
@@ -157,13 +220,13 @@ public class DatabaseController {
             return artistNames;
         }catch (SQLException e){
             System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
-            System.out.println("SQL Connection Failed - FIND USER"); // Print failure message
+            System.out.println("SQL Connection Failed - RETURN ALL ARTISTS"); // Print failure message
             return null;
         }
     }
 
     public void addArtistToDatabase(String artist){
-        if(connect()){
+        if(connect(false)){
             String sql = "INSERT INTO artists(artist_name) VALUES (?)";
             try (Connection conn = DriverManager.getConnection(url, user, password);
                  PreparedStatement pst = conn.prepareStatement(sql)) {
@@ -171,8 +234,49 @@ public class DatabaseController {
                 pst.executeUpdate();
             }catch (SQLException e){
                 System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
+                System.out.println("SQL Connection Failed - ADD ARTIST TO DATABASE"); // Print failure message
+            }
+        }
+    }
+
+    public void addPreferredArtist(int artist, String user_name){
+        if(connect(false)){
+            //get user id:
+            int userID = findUserID(user_name);
+            //get artist id:
+            int artistID = findArtistID(returnAllArtists().get(artist));
+
+            //add to database
+            String sql = "INSERT INTO users_preferredartists(user_id, artist_id) VALUES (?, ?)";
+            try (Connection conn = DriverManager.getConnection(url, user, password);
+                 PreparedStatement pst = conn.prepareStatement(sql)) {
+                pst.setInt(1, userID);
+                pst.setInt(2, artistID);
+                pst.executeUpdate();
+            }catch (SQLException e){
+                System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
+                System.out.println("SQL Connection Failed - ADD PREFERRED ARTIST"); // Print failure message
+            }
+        }
+    }
+
+    public List<Integer> getPreferences(int user_id){
+        List<Integer> preferredArtist = new ArrayList<>();
+        if(connect(false)){
+            String sql = "SELECT artist_id FROM users_preferredartists WHERE user_id = ?";
+            try (Connection conn = DriverManager.getConnection(url, user, password);
+                 PreparedStatement pst = conn.prepareStatement(sql)) {
+                pst.setInt(1, user_id);
+                ResultSet rs = pst.executeQuery();
+                while(rs.next()){
+                    preferredArtist.add(rs.getInt("artist_id"));
+                }
+                return preferredArtist;
+            }catch(SQLException e){
+                System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
                 System.out.println("SQL Connection Failed - SIGN UP"); // Print failure message
             }
         }
+        return null;
     }
 }

@@ -34,14 +34,12 @@ public class HomeViewController {
     private List<SongScraper.Song> topSongs = new ArrayList<>();
 
     public void initialize() {
-        // Get the current user's information
-        String currentUserUsername = DatabaseController.currentUserUsername; // Get the current user's username
-        String username = database.findUserUsername(currentUserUsername); // make sure the username is valid
-
         // Set the text fields to the current user's information
-        currentUsername.setText("'" + username + "'"); // Set the current username
+        user_name = database.currentUserUsername;
+        user_id = database.findUserID(user_name); // Find the user ID
 
-        displayTopSongs();
+        currentUsername.setText("'" + user_name + "'"); // Set the current username
+        displayTopSongs(filterSongsByPreferences(SongScraper.getTopSongs(), user_id));
     }
 
     //region action events
@@ -61,7 +59,10 @@ public class HomeViewController {
             populateArtistList();
         } else {
             // Save preferences and update the displayed top songs
-            displayTopSongs();
+            for (String artist : selectedArtists) {
+                database.addPreferredArtist(user_id, artist);
+            }
+            displayTopSongs(filterSongsByPreferences(SongScraper.getTopSongs(),user_id));
         }
     }
     //endregion
@@ -79,22 +80,19 @@ public class HomeViewController {
                 } else {
                     selectedArtists.remove(artist);
                 }
-                displayTopSongs(); // Update the displayed top songs immediately
             });
             artistListContainer.getChildren().add(checkBox);
         }
     }
 
-    public void displayTopSongs() {
-        topSongs = SongScraper.getTopSongs();
-        List<SongScraper.Song> filteredSongs = filterSongsByPreferences(topSongs);
-
+    public void displayTopSongs(List<SongScraper.Song> topSongs) {
         topSongsContainer.getChildren().clear();
-        for (SongScraper.Song song : filteredSongs) {
+        for (SongScraper.Song song : topSongs) {
             Label songLabel = new Label(song.getTitle());
             songLabel.setFont(Font.font("System", FontWeight.BOLD, 12));
             topSongsContainer.getChildren().add(songLabel);
 
+            //add artists with a tab
             for (String artist : song.getArtists()) {
                 Label artistLabel = new Label("    " + artist);
                 topSongsContainer.getChildren().add(artistLabel);

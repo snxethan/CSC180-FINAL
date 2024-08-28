@@ -32,7 +32,7 @@ public class LoginController {
         String username = usernameField.getText().trim(); // trim removes whitespace
         String password = passwordField.getText().trim(); // trim removes whitespace
         // mysql connection to user database
-        if(database.connect()){
+        if(database.connect(false)){
             // check if username and password are in the database
             if(database.loginUser(username,password)){
                 changeScene(Event,"home-view.fxml", SongApplication.homeTitle); // change scene to home

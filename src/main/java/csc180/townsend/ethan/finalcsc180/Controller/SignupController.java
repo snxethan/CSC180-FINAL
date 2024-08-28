@@ -29,7 +29,7 @@ public class SignupController {
 
     //region Action Events
     public void onSignUpButtonClick(ActionEvent event) {
-        if(database.connect()) {
+        if(database.connect(false)) {
             if (validateUser()) {
                 // If all fields are valid, sign up the user and add to database
                 textDisplay.setText(database.signUpUser(usernameField.getText(), passwordField.getText()));

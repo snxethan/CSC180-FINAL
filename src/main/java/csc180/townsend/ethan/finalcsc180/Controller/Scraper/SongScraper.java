@@ -57,7 +57,7 @@ public class SongScraper {
             //add to database
             for (Element artistElement : artistElements) {
                 //checks the database to see if person exists
-                int possibleID = dbController.checkArtistExists(artistElement.toString());
+                int possibleID = dbController.validateArtist(artistElement.toString());
                 if(possibleID == 0){
                     //add to database, then save the ID to artistIDs
                     dbController.addArtistToDatabase(artistElement.toString());
@@ -121,7 +121,7 @@ public class SongScraper {
             for (Element artistElement : artistElements) {
                 //artists.add(artistElement.text());
                 //checks the database to see if person exists
-                int possibleID = dbController.checkArtistExists(artistElement.text());
+                int possibleID = dbController.validateArtist(artistElement.text());
                 if(possibleID == 0){
                     //add to database, then save the ID to artistIDs
                     dbController.addArtistToDatabase(artistElement.text());
