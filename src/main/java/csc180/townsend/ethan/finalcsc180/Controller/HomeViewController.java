@@ -96,7 +96,10 @@ public class HomeViewController {
         // Save the selected artists to the database
         database.removePerferredArtists(user_id);
         for (String artist : selectedArtists) {
-            database.addPreferredArtist(user_id, artist);
+            int artistId = database.findArtistID(artist);
+            if (artistId != 0) {
+                database.addPreferredArtist(artistId, user_name);
+            }
         }
     }
 
