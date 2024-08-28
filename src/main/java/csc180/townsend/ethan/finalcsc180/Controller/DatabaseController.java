@@ -278,6 +278,19 @@ public class DatabaseController {
             }
         }
     }
+    public void removePerferredArtists(int user_id){
+        if(connect(false)){
+            String sql = "DELETE FROM users_preferredartists WHERE user_id = ?";
+            try (Connection conn = DriverManager.getConnection(url, user, password);
+                 PreparedStatement pst = conn.prepareStatement(sql)) {
+                pst.setInt(1, user_id);
+                pst.executeUpdate();
+            }catch (SQLException e){
+                System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
+                System.out.println("SQL Connection Failed - REMOVE PREFERRED ARTIST"); // Print failure message
+            }
+        }
+    }
 
     public List<Integer> getPreferences(int user_id){
         List<Integer> preferredArtist = new ArrayList<>();

@@ -58,12 +58,11 @@ public class HomeViewController {
 
         if (!isArtistListVisible) {
             // Populate the artist list dynamically
+            selectedArtists.clear();
             populateArtistList();
         } else {
             // Save preferences and update the displayed top songs
-            for (String artist : selectedArtists) {
-                database.addPreferredArtist(user_id, artist);
-            }
+            savePreferences();
             displayTopSongs(filterSongsByPreferences(SongScraper.getTopSongs(), user_id));
         }
     }
@@ -73,9 +72,15 @@ public class HomeViewController {
         List<String> artists = SongScraper.getArtists();
         artistListContainer.getChildren().clear(); // Clear any existing children
 
+        // Get the user's current preferred artists
+        List<Integer> preferredArtistIds = database.getPreferences(user_id);
+        List<String> preferredArtists = preferredArtistIds.stream()
+                .map(database::findArtistName)
+                .collect(Collectors.toList());
+
         for (String artist : artists) {
             CheckBox checkBox = new CheckBox(artist);
-            checkBox.setSelected(selectedArtists.contains(artist));
+            checkBox.setSelected(preferredArtists.contains(artist));
             checkBox.setOnAction(event -> {
                 if (checkBox.isSelected()) {
                     selectedArtists.add(artist);
@@ -84,6 +89,14 @@ public class HomeViewController {
                 }
             });
             artistListContainer.getChildren().add(checkBox);
+        }
+    }
+
+    private void savePreferences() {
+        // Save the selected artists to the database
+        database.removePerferredArtists(user_id);
+        for (String artist : selectedArtists) {
+            database.addPreferredArtist(user_id, artist);
         }
     }
 
