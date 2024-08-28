@@ -64,7 +64,7 @@ public class HomeViewController {
             for (String artist : selectedArtists) {
                 database.addPreferredArtist(user_id, artist);
             }
-            displayTopSongs(filterSongsByPreferences(SongScraper.getTopSongs(),user_id));
+            displayTopSongs(filterSongsByPreferences(SongScraper.getTopSongs(), user_id));
         }
     }
     //endregion

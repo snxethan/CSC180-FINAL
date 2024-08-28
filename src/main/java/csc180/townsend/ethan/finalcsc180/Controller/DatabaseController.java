@@ -18,6 +18,8 @@ public class DatabaseController {
     static final String strUserCreated = "User successfully Created!";
     static final String strUserFound = "User Found";
     static final String strUserNotFound = "User Not Found";
+    static final String strArtistNotFound = "Artist Not Found";
+    static final String strArtistFound = "Artist Found";
     //endregion
 
     /**
@@ -204,6 +206,23 @@ public class DatabaseController {
             return 0;
         }
     }
+    public String findArtistName(int artist_id){
+        String sql = "SELECT artist_name FROM artists WHERE artist_id = ?";
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement pst = conn.prepareStatement(sql)) {
+            pst.setInt(1, artist_id);
+            ResultSet rs = pst.executeQuery();
+            if(rs.next()){
+                return rs.getString("artist_name");
+            } else {
+                return strArtistNotFound;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage() + "\n" + e.getSQLState()); // Print error message
+            System.out.println("SQL Connection Failed - FIND ARTIST NAME"); // Print failure message
+            return "Error Finding Artist";
+        }
+    }
     //endregion
 
 
@@ -239,12 +258,12 @@ public class DatabaseController {
         }
     }
 
-    public void addPreferredArtist(int artist, String user_name){
+    public void addPreferredArtist(int artist_id, String user_name){
         if(connect(false)){
             //get user id:
             int userID = findUserID(user_name);
             //get artist id:
-            int artistID = findArtistID(returnAllArtists().get(artist));
+            int artistID = findArtistID(findArtistName(artist_id));
 
             //add to database
             String sql = "INSERT INTO users_preferredartists(user_id, artist_id) VALUES (?, ?)";
