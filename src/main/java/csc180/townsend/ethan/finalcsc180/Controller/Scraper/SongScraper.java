@@ -72,7 +72,7 @@ public class SongScraper {
         }
     }
 
-    public static List<String> getTopSongs(){
+    public static List<Song> getTopSongs(){
         //FIXME: FILTER OUT DUPLICATES (there should be none)
         String response = request();
         if (response == null) {
@@ -85,12 +85,17 @@ public class SongScraper {
         // Select rows containing artist and track information
         Elements rows = doc.select("tr:has(a[href*='../track'])");
 
-        List<String> topSongs = new ArrayList<>();
+        List<Song> topSongs = new ArrayList<>();
         for (Element row : rows) {
-            // Select track element within the row
+            if (topSongs.size() >= 100) break;
             Element trackElement = row.selectFirst("a[href*='../track']");
+            Elements artistElements = row.select("a[href*='../artist']");
             if (trackElement != null) {
-                topSongs.add(trackElement.text());
+                List<String> artists = new ArrayList<>();
+                for (Element artistElement : artistElements) {
+                    artists.add(artistElement.text());
+                }
+                topSongs.add(new Song(trackElement.text(), artists));
             }
         }
         return topSongs;
@@ -131,4 +136,21 @@ public class SongScraper {
         return dbController.returnAllArtists();
     }
 
+    public static class Song {
+        private final String title;
+        private final List<String> artists;
+
+        public Song(String title, List<String> artists) {
+            this.title = title;
+            this.artists = artists;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public List<String> getArtists() {
+            return artists;
+        }
+    }
 }

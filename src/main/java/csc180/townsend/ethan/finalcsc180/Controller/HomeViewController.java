@@ -6,11 +6,16 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import static csc180.townsend.ethan.finalcsc180.ChangeScene.changeScene;
 
 public class HomeViewController {
@@ -19,11 +24,14 @@ public class HomeViewController {
     private Label currentUsername;
     @FXML
     private VBox artistListContainer, topSongsContainer;
+    @FXML
+    private ScrollPane artistListScrollPane, topSongsScrollPane;
+    private boolean toggleEdit = true;
     //endregion
 
     private final DatabaseController database = new DatabaseController();
     private List<String> selectedArtists = new ArrayList<>();
-    private List<String> topSongs = new ArrayList<>();
+    private List<SongScraper.Song> topSongs = new ArrayList<>();
 
     public void initialize() {
         // Get the current user's information
@@ -43,11 +51,18 @@ public class HomeViewController {
     }
 
     public void onEditPreferencesButtonClick() {
-        // Toggle the visibility of the top songs container
-        topSongsContainer.setVisible(!topSongsContainer.isVisible());
+        // Toggle the visibility of the artist list and top songs containers
+        boolean isArtistListVisible = artistListScrollPane.isVisible();
+        artistListScrollPane.setVisible(!isArtistListVisible);
+        topSongsScrollPane.setVisible(isArtistListVisible);
 
-        // Populate the artist list dynamically
-        populateArtistList();
+        if (!isArtistListVisible) {
+            // Populate the artist list dynamically
+            populateArtistList();
+        } else {
+            // Save preferences and update the displayed top songs
+            displayTopSongs();
+        }
     }
     //endregion
 
@@ -57,38 +72,42 @@ public class HomeViewController {
 
         for (String artist : artists) {
             CheckBox checkBox = new CheckBox(artist);
+            checkBox.setSelected(selectedArtists.contains(artist));
             checkBox.setOnAction(event -> {
                 if (checkBox.isSelected()) {
                     selectedArtists.add(artist);
                 } else {
                     selectedArtists.remove(artist);
                 }
-                // Update the displayed top songs based on selected artists
-                displayTopSongs();
+                displayTopSongs(); // Update the displayed top songs immediately
             });
             artistListContainer.getChildren().add(checkBox);
         }
     }
 
     public void displayTopSongs() {
-        //TODO: display all the scraped songs
         topSongs = SongScraper.getTopSongs();
-        List<String> filteredSongs = filterSongsByPreferences(topSongs);
+        List<SongScraper.Song> filteredSongs = filterSongsByPreferences(topSongs);
 
-        topSongsContainer.getChildren().clear(); // Clear any existing children
-        for (String song : filteredSongs){
-            Label songLabel = new Label(song);
+        topSongsContainer.getChildren().clear();
+        for (SongScraper.Song song : filteredSongs) {
+            Label songLabel = new Label(song.getTitle());
+            songLabel.setFont(Font.font("System", FontWeight.BOLD, 12));
             topSongsContainer.getChildren().add(songLabel);
-        }
 
+            for (String artist : song.getArtists()) {
+                Label artistLabel = new Label("    " + artist);
+                topSongsContainer.getChildren().add(artistLabel);
+            }
+        }
     }
 
-    private List<String> filterSongsByPreferences(List<String> topSongs) {
+    private List<SongScraper.Song> filterSongsByPreferences(List<SongScraper.Song> topSongs) {
         if (selectedArtists.isEmpty()) {
             return topSongs;
         }
         return topSongs.stream()
-                .filter(song -> selectedArtists.stream().anyMatch(song::contains))
+                .filter(song -> song.getArtists().stream().anyMatch(selectedArtists::contains))
                 .collect(Collectors.toList());
     }
 }

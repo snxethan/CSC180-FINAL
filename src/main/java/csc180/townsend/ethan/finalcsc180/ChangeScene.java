@@ -25,9 +25,6 @@ public class ChangeScene {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow(); // Get the current window
         Scene scene = new Scene(root); // Ensure dynamic resizing
 
-        // Optional: Set a preferred size for the scene if needed
-        scene.getRoot().autosize();
-
         stage.setTitle(windowTitle); // Set the title of the window
         stage.setScene(scene); // Set the scene of the window
 

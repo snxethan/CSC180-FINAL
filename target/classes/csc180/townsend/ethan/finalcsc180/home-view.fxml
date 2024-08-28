@@ -16,9 +16,11 @@
         <Button onAction="#onEditPreferencesButtonClick" text="Edit Preferences" textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
     </HBox>
 
-    <ScrollPane fitToWidth="true" fitToHeight="true">
+    <ScrollPane fx:id="artistListScrollPane" fitToWidth="true" fitToHeight="true" visible="false">
         <VBox fx:id="artistListContainer" spacing="5.0" />
     </ScrollPane>
 
-    <VBox fx:id="topSongsContainer" spacing="5.0" />
+    <ScrollPane fx:id="topSongsScrollPane" fitToWidth="true" fitToHeight="true">
+        <VBox fx:id="topSongsContainer" spacing="5.0" />
+    </ScrollPane>
 </VBox>
