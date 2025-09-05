@@ -103,10 +103,6 @@ The application uses a modular structure defined in `module-info.java` and requi
 - `org.apache.httpcomponents.httpcore`
 - `org.apache.httpcomponents.httpclient`
 
-## Author
+## Author(s)
 
-**Ethan Townsend** - CSC180 Final Project
-
-## License
-
-This project is created for educational purposes as part of CSC180 coursework.
+- [**Ethan Townsend (snxethan)**](www.ethantownsend.dev)
